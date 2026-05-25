@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Water Meter Report</title>
+  <title>تقرير استهلاك المياه والصرف</title>
 
   <style>
     body {
@@ -12,6 +12,7 @@
       margin: 0;
       padding: 14px;
       color: #222;
+      direction: rtl;
     }
 
     .container {
@@ -56,6 +57,7 @@
       border-radius: 9px;
       border: 1px solid #ccc;
       box-sizing: border-box;
+      text-align: right;
     }
 
     button {
@@ -93,7 +95,7 @@
     }
 
     .report-card {
-      border-left: 5px solid #0069d9;
+      border-right: 5px solid #0069d9;
     }
 
     .report-title {
@@ -117,7 +119,7 @@
     }
 
     .row span:last-child {
-      text-align: right;
+      text-align: left;
     }
 
     .grand-total {
@@ -132,6 +134,9 @@
 
     small {
       color: #666;
+      line-height: 1.6;
+      display: block;
+      margin-top: 8px;
     }
   </style>
 </head>
@@ -140,42 +145,42 @@
 
 <div class="container">
 
-  <h1>Water & Sewage Report</h1>
+  <h1>تقرير استهلاك المياه والصرف</h1>
 
   <div class="section">
-    <h2>Billing Period</h2>
+    <h2>فترة الفاتورة</h2>
 
-    <label>Start Date</label>
+    <label>تاريخ البداية</label>
     <input type="date" id="startDate">
 
-    <label>End Date</label>
+    <label>تاريخ النهاية</label>
     <input type="date" id="endDate">
   </div>
 
   <div class="section">
-    <h2>Total Monthly Expenses</h2>
+    <h2>إجمالي المصاريف الشهرية</h2>
 
-    <label>Total Water Spent (SAR)</label>
-    <input type="number" id="totalWaterCost" placeholder="Example: 800">
+    <label>إجمالي مبلغ المياه المدفوع (ريال)</label>
+    <input type="number" id="totalWaterCost" placeholder="مثال: 800">
 
-    <label>Total Sewage Spent (SAR)</label>
-    <input type="number" id="totalSewageCost" placeholder="Example: 300">
+    <label>إجمالي مبلغ الصرف المدفوع (ريال)</label>
+    <input type="number" id="totalSewageCost" placeholder="مثال: 300">
   </div>
 
-  <h2>Apartment Readings</h2>
+  <h2>قراءات الشقق</h2>
 
   <div id="apartments"></div>
 
   <button class="primary" onclick="calculateReports()">
-    Generate Reports
+    إنشاء التقارير
   </button>
 
   <button class="success" onclick="saveCurrentData()">
-    Save Filled Current Readings
+    حفظ القراءات الحالية المدخلة
   </button>
 
   <button class="danger" onclick="resetAllData()">
-    Reset Saved Data
+    مسح البيانات المحفوظة
   </button>
 
   <div id="reports"></div>
@@ -194,31 +199,35 @@ function getSavedValue(key, defaultValue) {
 }
 
 function money(value) {
-  return `${Number(value).toFixed(2)} SAR`;
+  return `${Number(value).toFixed(2)} ريال`;
+}
+
+function liters(value) {
+  return `${Number(value).toLocaleString()} لتر`;
 }
 
 for (let i = 1; i <= APARTMENTS; i++) {
   apartmentsDiv.innerHTML += `
     <div class="apartment-card">
-      <h3>Apartment ${i}</h3>
+      <h3>الشقة ${i}</h3>
 
-      <label>Previous Reading</label>
+      <label>القراءة السابقة</label>
       <input
         type="number"
         id="prev${i}"
         value="${getSavedValue(`apt_${i}_previous`, 0)}"
       >
 
-      <label>Current Reading</label>
+      <label>القراءة الحالية</label>
       <input
         type="number"
         id="current${i}"
-        placeholder="Enter current reading"
+        placeholder="أدخل القراءة الحالية"
         value="${getSavedValue(`apt_${i}_current_draft`, "")}"
         oninput="localStorage.setItem('apt_${i}_current_draft', this.value)"
       >
 
-      <label>Previous Unpaid Amount (SAR)</label>
+      <label>المبلغ السابق غير المدفوع (ريال)</label>
       <input
         type="number"
         id="unpaid${i}"
@@ -226,7 +235,7 @@ for (let i = 1; i <= APARTMENTS; i++) {
       >
 
       <small>
-        You can leave empty apartments blank. Only filled apartments will be calculated and saved.
+        يمكنك ترك الشقق غير المطلوبة فارغة. سيتم احتساب وحفظ الشقق التي تم إدخال قراءتها فقط.
       </small>
     </div>
   `;
@@ -239,12 +248,12 @@ function calculateReports() {
   const totalSewageCost = Number(document.getElementById("totalSewageCost").value || 0);
 
   if (!startDate || !endDate) {
-    alert("Please select start and end dates.");
+    alert("يرجى اختيار تاريخ البداية وتاريخ النهاية.");
     return;
   }
 
   if (new Date(endDate) < new Date(startDate)) {
-    alert("End date cannot be before start date.");
+    alert("تاريخ النهاية لا يمكن أن يكون قبل تاريخ البداية.");
     return;
   }
 
@@ -263,7 +272,7 @@ function calculateReports() {
     const current = Number(currentInput);
 
     if (current < previous) {
-      alert(`Apartment ${i}: current reading cannot be less than previous reading.`);
+      alert(`الشقة ${i}: القراءة الحالية لا يمكن أن تكون أقل من القراءة السابقة.`);
       return;
     }
 
@@ -280,11 +289,11 @@ function calculateReports() {
   }
 
   if (data.length === 0) {
-    alert("Please enter at least one apartment reading.");
+    alert("يرجى إدخال قراءة شقة واحدة على الأقل.");
     return;
   }
 
-  let reportsHTML = `<h2>Individual Apartment Reports</h2>`;
+  let reportsHTML = `<h2>تقارير الشقق</h2>`;
   let grandTotal = 0;
 
   data.forEach(item => {
@@ -301,50 +310,55 @@ function calculateReports() {
     reportsHTML += `
       <div class="report-card">
         <div class="report-title">
-          Apartment ${item.apartment}
+          تقرير الشقة ${item.apartment}
         </div>
 
         <div class="summary">
-          <strong>Period:</strong> ${startDate} to ${endDate}
+          <strong>الفترة:</strong> من ${startDate} إلى ${endDate}
         </div>
 
         <div class="row">
-          <span>Previous Reading</span>
-          <span>${item.previous}</span>
+          <span>رقم الشقة</span>
+          <span>${item.apartment}</span>
         </div>
 
         <div class="row">
-          <span>Current Reading</span>
-          <span>${item.current}</span>
+          <span>القراءة السابقة</span>
+          <span>${liters(item.previous)}</span>
         </div>
 
         <div class="row">
-          <span>Net Consumption</span>
-          <span>${item.netConsumption}</span>
+          <span>القراءة الحالية</span>
+          <span>${liters(item.current)}</span>
         </div>
 
         <div class="row">
-          <span>Consumption Ratio</span>
+          <span>صافي الاستهلاك</span>
+          <span>${liters(item.netConsumption)}</span>
+        </div>
+
+        <div class="row">
+          <span>نسبة الاستهلاك</span>
           <span>${(ratio * 100).toFixed(2)}%</span>
         </div>
 
         <div class="row">
-          <span>Water Cost</span>
+          <span>تكلفة المياه</span>
           <span>${money(waterCost)}</span>
         </div>
 
         <div class="row">
-          <span>Sewage Cost</span>
+          <span>تكلفة الصرف</span>
           <span>${money(sewageCost)}</span>
         </div>
 
         <div class="row">
-          <span>Previous Unpaid</span>
+          <span>المبلغ السابق غير المدفوع</span>
           <span>${money(item.unpaid)}</span>
         </div>
 
         <div class="row">
-          <span>Total Amount</span>
+          <span>الإجمالي المطلوب</span>
           <span><strong>${money(totalMoney)}</strong></span>
         </div>
       </div>
@@ -353,9 +367,9 @@ function calculateReports() {
 
   reportsHTML += `
     <div class="grand-total">
-      Total Building Consumption: ${totalConsumption}
+      إجمالي استهلاك المبنى: ${liters(totalConsumption)}
       <br><br>
-      Total Amount to Collect: ${money(grandTotal)}
+      إجمالي المبلغ المطلوب تحصيله: ${money(grandTotal)}
     </div>
   `;
 
@@ -383,15 +397,15 @@ function saveCurrentData() {
   }
 
   if (savedCount === 0) {
-    alert("Please enter at least one current reading before saving.");
+    alert("يرجى إدخال قراءة حالية واحدة على الأقل قبل الحفظ.");
     return;
   }
 
-  alert(`${savedCount} apartment reading(s) saved successfully.`);
+  alert(`تم حفظ قراءات ${savedCount} شقة بنجاح.`);
 }
 
 function resetAllData() {
-  if (!confirm("Are you sure you want to reset all saved readings and unpaid amounts?")) {
+  if (!confirm("هل أنت متأكد من مسح جميع القراءات والمبالغ المحفوظة؟")) {
     return;
   }
 
