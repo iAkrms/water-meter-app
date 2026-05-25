@@ -3,45 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Water Meter App</title>
+  <title>Water Meter Report</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f6f8;
+      background: #eef2f5;
       margin: 0;
-      padding: 15px;
+      padding: 14px;
+      color: #222;
     }
 
     .container {
-      max-width: 500px;
+      max-width: 520px;
       margin: auto;
     }
 
-    h1 {
+    h1, h2 {
       text-align: center;
-      margin-bottom: 20px;
     }
 
-    .card {
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-top: 25px;
+    }
+
+    .section, .apartment-card, .report-card {
       background: white;
       padding: 15px;
-      margin-bottom: 12px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      margin-bottom: 14px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     label {
       display: block;
-      margin-bottom: 6px;
+      margin-top: 10px;
+      margin-bottom: 5px;
       font-weight: bold;
+      font-size: 14px;
     }
 
     input {
       width: 100%;
       padding: 12px;
       font-size: 16px;
-      border-radius: 8px;
+      border-radius: 9px;
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
@@ -51,51 +63,71 @@
       padding: 14px;
       margin-top: 10px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
     }
 
-    .calc-btn {
-      background: #007bff;
+    .primary {
+      background: #0069d9;
       color: white;
     }
 
-    .save-btn {
+    .success {
       background: #28a745;
       color: white;
     }
 
-    .reset-btn {
+    .danger {
       background: #dc3545;
       color: white;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      margin-top: 20px;
+    .summary {
+      background: #f7f9fb;
+      padding: 12px;
       border-radius: 10px;
-      overflow: hidden;
+      margin-top: 10px;
+      line-height: 1.7;
     }
 
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
+    .report-card {
+      border-left: 5px solid #0069d9;
     }
 
-    th {
-      background: #f0f0f0;
-    }
-
-    .total {
-      margin-top: 15px;
-      font-size: 18px;
+    .report-title {
+      font-size: 20px;
       font-weight: bold;
+      margin-bottom: 10px;
+      color: #0069d9;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding: 8px 0;
+      gap: 10px;
+    }
+
+    .row span:first-child {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .row span:last-child {
+      text-align: right;
+    }
+
+    .grand-total {
+      background: #222;
+      color: white;
+      padding: 15px;
+      border-radius: 14px;
       text-align: center;
+      font-size: 18px;
+      margin-top: 15px;
     }
 
     small {
@@ -108,185 +140,249 @@
 
 <div class="container">
 
-  <h1>Water Meter Report</h1>
+  <h1>Water & Sewage Report</h1>
 
-  <div id="inputs"></div>
+  <div class="section">
+    <h2>Billing Period</h2>
 
-  <button class="calc-btn" onclick="calculateReport()">
-    Calculate Report
+    <label>Start Date</label>
+    <input type="date" id="startDate">
+
+    <label>End Date</label>
+    <input type="date" id="endDate">
+  </div>
+
+  <div class="section">
+    <h2>Total Monthly Expenses</h2>
+
+    <label>Total Water Spent (SAR)</label>
+    <input type="number" id="totalWaterCost" placeholder="Example: 800">
+
+    <label>Total Sewage Spent (SAR)</label>
+    <input type="number" id="totalSewageCost" placeholder="Example: 300">
+  </div>
+
+  <h2>Apartment Readings</h2>
+
+  <div id="apartments"></div>
+
+  <button class="primary" onclick="calculateReports()">
+    Generate Reports
   </button>
 
-  <button class="save-btn" onclick="saveReadings()">
-    Save Current Readings
+  <button class="success" onclick="saveCurrentData()">
+    Save Current Readings & Unpaid Amounts
   </button>
 
-  <button class="reset-btn" onclick="resetReadings()">
-    Reset Saved Readings
+  <button class="danger" onclick="resetAllData()">
+    Reset Saved Data
   </button>
 
-  <div id="report"></div>
+  <div id="reports"></div>
 
 </div>
 
 <script>
-
 const APARTMENTS = 8;
 
-const CONFIG = {
-  ratePerUnit: 2.5,
-  fixedFee: 0,
-  currency: "SAR"
-};
-
-const inputsContainer = document.getElementById("inputs");
+const apartmentsDiv = document.getElementById("apartments");
 
 for (let i = 1; i <= APARTMENTS; i++) {
+  apartmentsDiv.innerHTML += `
+    <div class="apartment-card">
+      <h3>Apartment ${i}</h3>
 
-  inputsContainer.innerHTML += `
-    <div class="card">
+      <label>Previous Reading</label>
+      <input type="number" id="prev${i}" value="${getSavedValue(`apt_${i}_previous`, 0)}">
 
-      <label>
-        Apartment ${i} - New Reading
-      </label>
+      <label>Current Reading</label>
+      <input type="number" id="current${i}" placeholder="Enter current reading">
 
-      <input
-        type="number"
-        id="apt${i}"
-        placeholder="Enter reading"
-      >
+      <label>Previous Unpaid Amount (SAR)</label>
+      <input type="number" id="unpaid${i}" value="${getSavedValue(`apt_${i}_unpaid`, 0)}">
 
       <small>
-        Previous reading:
-        <span id="last${i}">
-          ${getLastReading(i)}
-        </span>
+        You can edit previous reading or unpaid amount manually.
       </small>
-
     </div>
   `;
 }
 
-function getLastReading(apartment) {
-  return Number(
-    localStorage.getItem(`apt_${apartment}_last`) || 0
-  );
+function getSavedValue(key, defaultValue) {
+  return localStorage.getItem(key) !== null
+    ? Number(localStorage.getItem(key))
+    : defaultValue;
 }
 
-function calculateReport() {
+function money(value) {
+  return `${value.toFixed(2)} SAR`;
+}
 
-  let rows = "";
+function calculateReports() {
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+  const totalWaterCost = Number(document.getElementById("totalWaterCost").value);
+  const totalSewageCost = Number(document.getElementById("totalSewageCost").value);
+
+  if (!startDate || !endDate) {
+    alert("Please select start and end dates.");
+    return;
+  }
+
+  if (new Date(endDate) < new Date(startDate)) {
+    alert("End date cannot be before start date.");
+    return;
+  }
+
+  if (totalWaterCost < 0 || totalSewageCost < 0) {
+    alert("Costs cannot be negative.");
+    return;
+  }
+
+  let data = [];
   let totalConsumption = 0;
-  let totalFees = 0;
 
   for (let i = 1; i <= APARTMENTS; i++) {
+    const previous = Number(document.getElementById(`prev${i}`).value);
+    const current = Number(document.getElementById(`current${i}`).value);
+    const unpaid = Number(document.getElementById(`unpaid${i}`).value);
 
-    const newReading = Number(
-      document.getElementById(`apt${i}`).value
-    );
-
-    const lastReading = getLastReading(i);
-
-    if (newReading < lastReading) {
-      alert(
-        `Apartment ${i}: new reading cannot be less than previous reading`
-      );
+    if (document.getElementById(`current${i}`).value === "") {
+      alert(`Please enter current reading for Apartment ${i}.`);
       return;
     }
 
-    const consumption = newReading - lastReading;
+    if (current < previous) {
+      alert(`Apartment ${i}: current reading cannot be less than previous reading.`);
+      return;
+    }
 
-    const fee =
-      (consumption * CONFIG.ratePerUnit)
-      + CONFIG.fixedFee;
+    const netConsumption = current - previous;
+    totalConsumption += netConsumption;
 
-    totalConsumption += consumption;
-    totalFees += fee;
-
-    rows += `
-      <tr>
-        <td>${i}</td>
-        <td>${lastReading}</td>
-        <td>${newReading}</td>
-        <td>${consumption}</td>
-        <td>${fee.toFixed(2)} ${CONFIG.currency}</td>
-      </tr>
-    `;
+    data.push({
+      apartment: i,
+      previous,
+      current,
+      netConsumption,
+      unpaid
+    });
   }
 
-  document.getElementById("report").innerHTML = `
+  let reportsHTML = `<h2>Individual Apartment Reports</h2>`;
 
-    <table>
+  let grandTotal = 0;
 
-      <thead>
-        <tr>
-          <th>Apt</th>
-          <th>Previous</th>
-          <th>Current</th>
-          <th>Consumption</th>
-          <th>Fee</th>
-        </tr>
-      </thead>
+  data.forEach(item => {
+    const ratio = totalConsumption === 0
+      ? 0
+      : item.netConsumption / totalConsumption;
 
-      <tbody>
-        ${rows}
-      </tbody>
+    const waterCost = totalWaterCost * ratio;
+    const sewageCost = totalSewageCost * ratio;
+    const totalMoney = waterCost + sewageCost + item.unpaid;
 
-    </table>
+    grandTotal += totalMoney;
 
-    <div class="total">
-      Total Consumption:
-      ${totalConsumption}
+    reportsHTML += `
+      <div class="report-card">
+        <div class="report-title">
+          Apartment ${item.apartment}
+        </div>
+
+        <div class="summary">
+          Period: ${startDate} to ${endDate}
+        </div>
+
+        <div class="row">
+          <span>Previous Consumption</span>
+          <span>${item.previous}</span>
+        </div>
+
+        <div class="row">
+          <span>Current Consumption</span>
+          <span>${item.current}</span>
+        </div>
+
+        <div class="row">
+          <span>Net Consumption</span>
+          <span>${item.netConsumption}</span>
+        </div>
+
+        <div class="row">
+          <span>Consumption Ratio</span>
+          <span>${(ratio * 100).toFixed(2)}%</span>
+        </div>
+
+        <div class="row">
+          <span>Water Cost</span>
+          <span>${money(waterCost)}</span>
+        </div>
+
+        <div class="row">
+          <span>Sewage Cost</span>
+          <span>${money(sewageCost)}</span>
+        </div>
+
+        <div class="row">
+          <span>Previous Unpaid Amount</span>
+          <span>${money(item.unpaid)}</span>
+        </div>
+
+        <div class="row">
+          <span>Total Amount</span>
+          <span><strong>${money(totalMoney)}</strong></span>
+        </div>
+      </div>
+    `;
+  });
+
+  reportsHTML += `
+    <div class="grand-total">
+      Total Building Consumption: ${totalConsumption}
       <br><br>
-
-      Total Fees:
-      ${totalFees.toFixed(2)}
-      ${CONFIG.currency}
+      Total Amount to Collect: ${money(grandTotal)}
     </div>
   `;
+
+  document.getElementById("reports").innerHTML = reportsHTML;
 }
 
-function saveReadings() {
-
+function saveCurrentData() {
   for (let i = 1; i <= APARTMENTS; i++) {
+    const currentInput = document.getElementById(`current${i}`);
+    const unpaidInput = document.getElementById(`unpaid${i}`);
 
-    const value =
-      document.getElementById(`apt${i}`).value;
-
-    if (value === "") {
-      alert(`Please enter Apartment ${i} reading`);
+    if (currentInput.value === "") {
+      alert(`Please enter current reading for Apartment ${i} before saving.`);
       return;
     }
 
-    localStorage.setItem(
-      `apt_${i}_last`,
-      Number(value)
-    );
+    localStorage.setItem(`apt_${i}_previous`, Number(currentInput.value));
+    localStorage.setItem(`apt_${i}_unpaid`, Number(unpaidInput.value));
 
-    document.getElementById(`last${i}`).innerText =
-      value;
+    document.getElementById(`prev${i}`).value = Number(currentInput.value);
   }
 
-  alert("Readings saved successfully.");
+  alert("Current readings saved as previous readings for next period.");
 }
 
-function resetReadings() {
-
-  if (!confirm("Reset all saved readings?")) {
+function resetAllData() {
+  if (!confirm("Are you sure you want to reset all saved readings and unpaid amounts?")) {
     return;
   }
 
   for (let i = 1; i <= APARTMENTS; i++) {
+    localStorage.removeItem(`apt_${i}_previous`);
+    localStorage.removeItem(`apt_${i}_unpaid`);
 
-    localStorage.removeItem(`apt_${i}_last`);
-
-    document.getElementById(`last${i}`).innerText = 0;
-
-    document.getElementById(`apt${i}`).value = "";
+    document.getElementById(`prev${i}`).value = 0;
+    document.getElementById(`current${i}`).value = "";
+    document.getElementById(`unpaid${i}`).value = 0;
   }
 
-  document.getElementById("report").innerHTML = "";
+  document.getElementById("reports").innerHTML = "";
 }
-
 </script>
 
 </body>
