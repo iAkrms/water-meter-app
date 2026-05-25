@@ -119,7 +119,8 @@
     .meter-title {
       font-weight: bold;
       color: var(--primary);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
+      font-size: 14px;
     }
 
     small {
@@ -131,30 +132,34 @@
 
     .report-card {
       border-inline-start: 5px solid var(--primary);
+      padding: 12px;
+      border-radius: 14px;
     }
 
     .report-title {
-      font-size: 21px;
+      font-size: 18px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       color: var(--primary);
       text-align: center;
     }
 
     .summary {
       background: #f7f9fb;
-      padding: 12px;
+      padding: 8px;
       border-radius: 10px;
-      margin-top: 10px;
-      line-height: 1.8;
+      margin-top: 6px;
+      line-height: 1.5;
+      font-size: 13px;
     }
 
     .row {
       display: flex;
       justify-content: space-between;
       border-bottom: 1px solid #eee;
-      padding: 9px 0;
+      padding: 5px 0;
       gap: 10px;
+      font-size: 13px;
     }
 
     .row span:first-child {
@@ -164,28 +169,28 @@
 
     .total-row {
       background: #f0f7ff;
-      padding: 12px;
+      padding: 8px;
       border-radius: 12px;
-      margin-top: 10px;
+      margin-top: 8px;
       font-weight: bold;
-      font-size: 17px;
+      font-size: 14px;
     }
 
     .bar-area {
-      margin-top: 12px;
-      margin-bottom: 12px;
+      margin-top: 6px;
+      margin-bottom: 6px;
     }
 
     .bar-label {
       display: flex;
       justify-content: space-between;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: bold;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .bar-track {
-      height: 16px;
+      height: 10px;
       background: #e5e7eb;
       border-radius: 999px;
       overflow: hidden;
@@ -201,24 +206,26 @@
     .meter-report {
       border: 1px solid var(--border);
       background: #fafafa;
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 12px;
+      border-radius: 12px;
+      padding: 8px;
+      margin-top: 8px;
     }
 
     .grand-total {
       background: #111827;
       color: white;
-      padding: 18px;
+      padding: 12px;
       border-radius: 16px;
       text-align: center;
-      font-size: 18px;
+      font-size: 15px;
       margin-top: 15px;
-      line-height: 1.8;
+      line-height: 1.7;
     }
 
     .export-btn {
-      margin-top: 16px;
+      padding: 10px;
+      font-size: 13px;
+      margin-top: 10px;
       background: #111827;
       color: white;
     }
@@ -701,6 +708,7 @@ function saveCurrentData() {
 
     for (let meter = 1; meter <= METERS; meter++) {
       const currentInput = document.getElementById(`current_${apt}_${meter}`);
+      const previousInput = document.getElementById(`prev_${apt}_${meter}`);
 
       if (currentInput.value === "") continue;
 
@@ -713,8 +721,9 @@ function saveCurrentData() {
         `apt_${apt}_meter_${meter}_current_draft`
       );
 
-      document.getElementById(`prev_${apt}_${meter}`).value =
-        Number(currentInput.value);
+      previousInput.value = Number(currentInput.value);
+
+      currentInput.value = "";
 
       savedCount++;
     }
