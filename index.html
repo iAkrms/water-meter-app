@@ -171,7 +171,7 @@
   </button>
 
   <button class="success" onclick="saveCurrentData()">
-    Save Current Readings & Unpaid Amounts
+    Save Filled Current Readings
   </button>
 
   <button class="danger" onclick="resetAllData()">
@@ -187,50 +187,56 @@ const APARTMENTS = 8;
 
 const apartmentsDiv = document.getElementById("apartments");
 
+function getSavedValue(key, defaultValue) {
+  return localStorage.getItem(key) !== null
+    ? localStorage.getItem(key)
+    : defaultValue;
+}
+
+function money(value) {
+  return `${Number(value).toFixed(2)} SAR`;
+}
+
 for (let i = 1; i <= APARTMENTS; i++) {
   apartmentsDiv.innerHTML += `
     <div class="apartment-card">
       <h3>Apartment ${i}</h3>
 
       <label>Previous Reading</label>
-      <input type="number" id="prev${i}" value="${getSavedValue(`apt_${i}_previous`, 0)}">
+      <input
+        type="number"
+        id="prev${i}"
+        value="${getSavedValue(`apt_${i}_previous`, 0)}"
+      >
 
       <label>Current Reading</label>
-      <input type="number" id="current${i}" placeholder="Enter current reading">
+      <input
+        type="number"
+        id="current${i}"
+        placeholder="Enter current reading"
+        value="${getSavedValue(`apt_${i}_current_draft`, "")}"
+        oninput="localStorage.setItem('apt_${i}_current_draft', this.value)"
+      >
 
       <label>Previous Unpaid Amount (SAR)</label>
-      <input type="number" id="unpaid${i}" value="${getSavedValue(`apt_${i}_unpaid`, 0)}">
+      <input
+        type="number"
+        id="unpaid${i}"
+        value="${getSavedValue(`apt_${i}_unpaid`, 0)}"
+      >
 
       <small>
-        You can edit previous reading or unpaid amount manually.
+        You can leave empty apartments blank. Only filled apartments will be calculated and saved.
       </small>
     </div>
   `;
 }
 
-function getSavedValue(key, defaultValue) {
-  return localStorage.getItem(key) !== null
-    ? Number(localStorage.getItem(key))
-    : defaultValue;
-}
-
-function money(value) {
-  return `${value.toFixed(2)} SAR`;
-}
-
 function calculateReports() {
-
-  const startDate =
-    document.getElementById("startDate").value;
-
-  const endDate =
-    document.getElementById("endDate").value;
-
-  const totalWaterCost =
-    Number(document.getElementById("totalWaterCost").value);
-
-  const totalSewageCost =
-    Number(document.getElementById("totalSewageCost").value);
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+  const totalWaterCost = Number(document.getElementById("totalWaterCost").value || 0);
+  const totalSewageCost = Number(document.getElementById("totalSewageCost").value || 0);
 
   if (!startDate || !endDate) {
     alert("Please select start and end dates.");
@@ -246,17 +252,10 @@ function calculateReports() {
   let totalConsumption = 0;
 
   for (let i = 1; i <= APARTMENTS; i++) {
+    const previous = Number(document.getElementById(`prev${i}`).value || 0);
+    const currentInput = document.getElementById(`current${i}`).value;
+    const unpaid = Number(document.getElementById(`unpaid${i}`).value || 0);
 
-    const previous =
-      Number(document.getElementById(`prev${i}`).value);
-
-    const currentInput =
-      document.getElementById(`current${i}`).value;
-
-    const unpaid =
-      Number(document.getElementById(`unpaid${i}`).value);
-
-    // Skip apartment if current reading is empty
     if (currentInput === "") {
       continue;
     }
@@ -264,15 +263,11 @@ function calculateReports() {
     const current = Number(currentInput);
 
     if (current < previous) {
-      alert(
-        `Apartment ${i}: current reading cannot be less than previous reading.`
-      );
+      alert(`Apartment ${i}: current reading cannot be less than previous reading.`);
       return;
     }
 
-    const netConsumption =
-      current - previous;
-
+    const netConsumption = current - previous;
     totalConsumption += netConsumption;
 
     data.push({
@@ -289,41 +284,28 @@ function calculateReports() {
     return;
   }
 
-  let reportsHTML =
-    `<h2>Individual Apartment Reports</h2>`;
-
+  let reportsHTML = `<h2>Individual Apartment Reports</h2>`;
   let grandTotal = 0;
 
   data.forEach(item => {
-
-    const ratio =
-      totalConsumption === 0
+    const ratio = totalConsumption === 0
       ? 0
       : item.netConsumption / totalConsumption;
 
-    const waterCost =
-      totalWaterCost * ratio;
-
-    const sewageCost =
-      totalSewageCost * ratio;
-
-    const totalMoney =
-      waterCost + sewageCost + item.unpaid;
+    const waterCost = totalWaterCost * ratio;
+    const sewageCost = totalSewageCost * ratio;
+    const totalMoney = waterCost + sewageCost + item.unpaid;
 
     grandTotal += totalMoney;
 
     reportsHTML += `
       <div class="report-card">
-
         <div class="report-title">
           Apartment ${item.apartment}
         </div>
 
         <div class="summary">
-          Period:
-          ${startDate}
-          to
-          ${endDate}
+          <strong>Period:</strong> ${startDate} to ${endDate}
         </div>
 
         <div class="row">
@@ -363,50 +345,50 @@ function calculateReports() {
 
         <div class="row">
           <span>Total Amount</span>
-          <span>
-            <strong>${money(totalMoney)}</strong>
-          </span>
+          <span><strong>${money(totalMoney)}</strong></span>
         </div>
-
       </div>
     `;
   });
 
   reportsHTML += `
     <div class="grand-total">
-
-      Total Building Consumption:
-      ${totalConsumption}
-
+      Total Building Consumption: ${totalConsumption}
       <br><br>
-
-      Total Amount to Collect:
-      ${money(grandTotal)}
-
+      Total Amount to Collect: ${money(grandTotal)}
     </div>
   `;
 
-  document.getElementById("reports").innerHTML =
-    reportsHTML;
+  document.getElementById("reports").innerHTML = reportsHTML;
 }
 
 function saveCurrentData() {
+  let savedCount = 0;
+
   for (let i = 1; i <= APARTMENTS; i++) {
     const currentInput = document.getElementById(`current${i}`);
     const unpaidInput = document.getElementById(`unpaid${i}`);
 
     if (currentInput.value === "") {
-      alert(`Please enter current reading for Apartment ${i} before saving.`);
-      return;
+      continue;
     }
 
     localStorage.setItem(`apt_${i}_previous`, Number(currentInput.value));
-    localStorage.setItem(`apt_${i}_unpaid`, Number(unpaidInput.value));
+    localStorage.setItem(`apt_${i}_unpaid`, Number(unpaidInput.value || 0));
+    localStorage.removeItem(`apt_${i}_current_draft`);
 
     document.getElementById(`prev${i}`).value = Number(currentInput.value);
+    currentInput.value = "";
+
+    savedCount++;
   }
 
-  alert("Current readings saved as previous readings for next period.");
+  if (savedCount === 0) {
+    alert("Please enter at least one current reading before saving.");
+    return;
+  }
+
+  alert(`${savedCount} apartment reading(s) saved successfully.`);
 }
 
 function resetAllData() {
@@ -417,6 +399,7 @@ function resetAllData() {
   for (let i = 1; i <= APARTMENTS; i++) {
     localStorage.removeItem(`apt_${i}_previous`);
     localStorage.removeItem(`apt_${i}_unpaid`);
+    localStorage.removeItem(`apt_${i}_current_draft`);
 
     document.getElementById(`prev${i}`).value = 0;
     document.getElementById(`current${i}`).value = "";
