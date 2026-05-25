@@ -74,11 +74,22 @@
 
     input {
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      display: block;
       padding: 12px;
       font-size: 16px;
       border-radius: 10px;
       border: 1px solid #ccc;
       box-sizing: border-box;
+    }
+
+    input[type="date"] {
+      max-width: 100%;
+      min-width: 0;
+      display: block;
+      appearance: none;
+      -webkit-appearance: none;
     }
 
     button {
@@ -206,9 +217,10 @@
       line-height: 1.8;
     }
 
-    .muted {
-      color: var(--muted);
-      font-size: 13px;
+    .export-btn {
+      margin-top: 16px;
+      background: #111827;
+      color: white;
     }
   </style>
 </head>
@@ -256,6 +268,8 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <script>
 const APARTMENTS = 8;
 const METERS = 3;
@@ -283,6 +297,7 @@ const T = {
     generate: "إنشاء التقارير",
     save: "حفظ القراءات الحالية المدخلة",
     reset: "مسح البيانات المحفوظة",
+    exportPNG: "تصدير تقرير الشقة كصورة PNG",
     reportsTitle: "تقارير الشقق",
     period: "الفترة",
     from: "من",
@@ -332,6 +347,7 @@ const T = {
     generate: "Generate Reports",
     save: "Save Entered Current Readings",
     reset: "Reset Saved Data",
+    exportPNG: "Export Apartment Report as PNG",
     reportsTitle: "Apartment Reports",
     period: "Period",
     from: "From",
@@ -417,7 +433,6 @@ function renderApp() {
   document.getElementById("totalSewageCost").placeholder = tr("placeholderSewage");
 
   renderApartmentInputs();
-
   document.getElementById("reports").innerHTML = "";
 }
 
@@ -483,9 +498,7 @@ function collectData() {
       const previous = Number(document.getElementById(`prev_${apt}_${meter}`).value || 0);
       const currentInput = document.getElementById(`current_${apt}_${meter}`).value;
 
-      if (currentInput === "") {
-        continue;
-      }
+      if (currentInput === "") continue;
 
       const current = Number(currentInput);
 
@@ -608,7 +621,7 @@ function calculateReports() {
     });
 
     reportsHTML += `
-      <div class="report-card">
+      <div class="report-card" id="report_apartment_${apt.apartment}">
         <div class="report-title">
           ${tr("apartmentReport")} ${apt.apartment}
         </div>
@@ -660,6 +673,10 @@ function calculateReports() {
           <span>${tr("totalAmount")}</span>
           <span>${money(totalMoney)}</span>
         </div>
+
+        <button class="export-btn" onclick="exportApartmentPNG(${apt.apartment})">
+          ${tr("exportPNG")}
+        </button>
       </div>
     `;
   });
@@ -685,9 +702,7 @@ function saveCurrentData() {
     for (let meter = 1; meter <= METERS; meter++) {
       const currentInput = document.getElementById(`current_${apt}_${meter}`);
 
-      if (currentInput.value === "") {
-        continue;
-      }
+      if (currentInput.value === "") continue;
 
       localStorage.setItem(
         `apt_${apt}_meter_${meter}_previous`,
@@ -714,9 +729,7 @@ function saveCurrentData() {
 }
 
 function resetAllData() {
-  if (!confirm(tr("resetConfirm"))) {
-    return;
-  }
+  if (!confirm(tr("resetConfirm"))) return;
 
   for (let apt = 1; apt <= APARTMENTS; apt++) {
     localStorage.removeItem(`apt_${apt}_unpaid`);
@@ -734,6 +747,27 @@ function resetAllData() {
   }
 
   document.getElementById("reports").innerHTML = "";
+}
+
+function exportApartmentPNG(apartmentNumber) {
+  const report = document.getElementById(`report_apartment_${apartmentNumber}`);
+
+  if (!report) return;
+
+  html2canvas(report, {
+    scale: 2,
+    backgroundColor: "#ffffff",
+    useCORS: true
+  }).then(canvas => {
+    const link = document.createElement("a");
+    link.download =
+      currentLang === "ar"
+        ? `تقرير_الشقة_${apartmentNumber}.png`
+        : `apartment_${apartmentNumber}_report.png`;
+
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
 }
 
 renderApp();
