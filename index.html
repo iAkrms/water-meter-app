@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Meter App</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 15px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .calc-btn {
+      background: #007bff;
+      color: white;
+    }
+
+    .save-btn {
+      background: #28a745;
+      color: white;
+    }
+
+    .reset-btn {
+      background: #dc3545;
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    .total {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    small {
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Water Meter Report</h1>
+
+  <div id="inputs"></div>
+
+  <button class="calc-btn" onclick="calculateReport()">
+    Calculate Report
+  </button>
+
+  <button class="save-btn" onclick="saveReadings()">
+    Save Current Readings
+  </button>
+
+  <button class="reset-btn" onclick="resetReadings()">
+    Reset Saved Readings
+  </button>
+
+  <div id="report"></div>
+
+</div>
+
+<script>
+
+const APARTMENTS = 8;
+
+const CONFIG = {
+  ratePerUnit: 2.5,
+  fixedFee: 0,
+  currency: "SAR"
+};
+
+const inputsContainer = document.getElementById("inputs");
+
+for (let i = 1; i <= APARTMENTS; i++) {
+
+  inputsContainer.innerHTML += `
+    <div class="card">
+
+      <label>
+        Apartment ${i} - New Reading
+      </label>
+
+      <input
+        type="number"
+        id="apt${i}"
+        placeholder="Enter reading"
+      >
+
+      <small>
+        Previous reading:
+        <span id="last${i}">
+          ${getLastReading(i)}
+        </span>
+      </small>
+
+    </div>
+  `;
+}
+
+function getLastReading(apartment) {
+  return Number(
+    localStorage.getItem(`apt_${apartment}_last`) || 0
+  );
+}
+
+function calculateReport() {
+
+  let rows = "";
+  let totalConsumption = 0;
+  let totalFees = 0;
+
+  for (let i = 1; i <= APARTMENTS; i++) {
+
+    const newReading = Number(
+      document.getElementById(`apt${i}`).value
+    );
+
+    const lastReading = getLastReading(i);
+
+    if (newReading < lastReading) {
+      alert(
+        `Apartment ${i}: new reading cannot be less than previous reading`
+      );
+      return;
+    }
+
+    const consumption = newReading - lastReading;
+
+    const fee =
+      (consumption * CONFIG.ratePerUnit)
+      + CONFIG.fixedFee;
+
+    totalConsumption += consumption;
+    totalFees += fee;
+
+    rows += `
+      <tr>
+        <td>${i}</td>
+        <td>${lastReading}</td>
+        <td>${newReading}</td>
+        <td>${consumption}</td>
+        <td>${fee.toFixed(2)} ${CONFIG.currency}</td>
+      </tr>
+    `;
+  }
+
+  document.getElementById("report").innerHTML = `
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Apt</th>
+          <th>Previous</th>
+          <th>Current</th>
+          <th>Consumption</th>
+          <th>Fee</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        ${rows}
+      </tbody>
+
+    </table>
+
+    <div class="total">
+      Total Consumption:
+      ${totalConsumption}
+      <br><br>
+
+      Total Fees:
+      ${totalFees.toFixed(2)}
+      ${CONFIG.currency}
+    </div>
+  `;
+}
+
+function saveReadings() {
+
+  for (let i = 1; i <= APARTMENTS; i++) {
+
+    const value =
+      document.getElementById(`apt${i}`).value;
+
+    if (value === "") {
+      alert(`Please enter Apartment ${i} reading`);
+      return;
+    }
+
+    localStorage.setItem(
+      `apt_${i}_last`,
+      Number(value)
+    );
+
+    document.getElementById(`last${i}`).innerText =
+      value;
+  }
+
+  alert("Readings saved successfully.");
+}
+
+function resetReadings() {
+
+  if (!confirm("Reset all saved readings?")) {
+    return;
+  }
+
+  for (let i = 1; i <= APARTMENTS; i++) {
+
+    localStorage.removeItem(`apt_${i}_last`);
+
+    document.getElementById(`last${i}`).innerText = 0;
+
+    document.getElementById(`apt${i}`).value = "";
+  }
+
+  document.getElementById("report").innerHTML = "";
+}
+
+</script>
+
+</body>
+</html>
