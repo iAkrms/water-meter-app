@@ -378,7 +378,6 @@ function saveCurrentData() {
     localStorage.removeItem(`apt_${i}_current_draft`);
 
     document.getElementById(`prev${i}`).value = Number(currentInput.value);
-    currentInput.value = "";
 
     savedCount++;
   }
