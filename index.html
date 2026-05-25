@@ -219,10 +219,18 @@ function money(value) {
 }
 
 function calculateReports() {
-  const startDate = document.getElementById("startDate").value;
-  const endDate = document.getElementById("endDate").value;
-  const totalWaterCost = Number(document.getElementById("totalWaterCost").value);
-  const totalSewageCost = Number(document.getElementById("totalSewageCost").value);
+
+  const startDate =
+    document.getElementById("startDate").value;
+
+  const endDate =
+    document.getElementById("endDate").value;
+
+  const totalWaterCost =
+    Number(document.getElementById("totalWaterCost").value);
+
+  const totalSewageCost =
+    Number(document.getElementById("totalSewageCost").value);
 
   if (!startDate || !endDate) {
     alert("Please select start and end dates.");
@@ -234,30 +242,37 @@ function calculateReports() {
     return;
   }
 
-  if (totalWaterCost < 0 || totalSewageCost < 0) {
-    alert("Costs cannot be negative.");
-    return;
-  }
-
   let data = [];
   let totalConsumption = 0;
 
   for (let i = 1; i <= APARTMENTS; i++) {
-    const previous = Number(document.getElementById(`prev${i}`).value);
-    const current = Number(document.getElementById(`current${i}`).value);
-    const unpaid = Number(document.getElementById(`unpaid${i}`).value);
 
-    if (document.getElementById(`current${i}`).value === "") {
-      alert(`Please enter current reading for Apartment ${i}.`);
-      return;
+    const previous =
+      Number(document.getElementById(`prev${i}`).value);
+
+    const currentInput =
+      document.getElementById(`current${i}`).value;
+
+    const unpaid =
+      Number(document.getElementById(`unpaid${i}`).value);
+
+    // Skip apartment if current reading is empty
+    if (currentInput === "") {
+      continue;
     }
+
+    const current = Number(currentInput);
 
     if (current < previous) {
-      alert(`Apartment ${i}: current reading cannot be less than previous reading.`);
+      alert(
+        `Apartment ${i}: current reading cannot be less than previous reading.`
+      );
       return;
     }
 
-    const netConsumption = current - previous;
+    const netConsumption =
+      current - previous;
+
     totalConsumption += netConsumption;
 
     data.push({
@@ -269,38 +284,55 @@ function calculateReports() {
     });
   }
 
-  let reportsHTML = `<h2>Individual Apartment Reports</h2>`;
+  if (data.length === 0) {
+    alert("Please enter at least one apartment reading.");
+    return;
+  }
+
+  let reportsHTML =
+    `<h2>Individual Apartment Reports</h2>`;
 
   let grandTotal = 0;
 
   data.forEach(item => {
-    const ratio = totalConsumption === 0
+
+    const ratio =
+      totalConsumption === 0
       ? 0
       : item.netConsumption / totalConsumption;
 
-    const waterCost = totalWaterCost * ratio;
-    const sewageCost = totalSewageCost * ratio;
-    const totalMoney = waterCost + sewageCost + item.unpaid;
+    const waterCost =
+      totalWaterCost * ratio;
+
+    const sewageCost =
+      totalSewageCost * ratio;
+
+    const totalMoney =
+      waterCost + sewageCost + item.unpaid;
 
     grandTotal += totalMoney;
 
     reportsHTML += `
       <div class="report-card">
+
         <div class="report-title">
           Apartment ${item.apartment}
         </div>
 
         <div class="summary">
-          Period: ${startDate} to ${endDate}
+          Period:
+          ${startDate}
+          to
+          ${endDate}
         </div>
 
         <div class="row">
-          <span>Previous Consumption</span>
+          <span>Previous Reading</span>
           <span>${item.previous}</span>
         </div>
 
         <div class="row">
-          <span>Current Consumption</span>
+          <span>Current Reading</span>
           <span>${item.current}</span>
         </div>
 
@@ -325,27 +357,37 @@ function calculateReports() {
         </div>
 
         <div class="row">
-          <span>Previous Unpaid Amount</span>
+          <span>Previous Unpaid</span>
           <span>${money(item.unpaid)}</span>
         </div>
 
         <div class="row">
           <span>Total Amount</span>
-          <span><strong>${money(totalMoney)}</strong></span>
+          <span>
+            <strong>${money(totalMoney)}</strong>
+          </span>
         </div>
+
       </div>
     `;
   });
 
   reportsHTML += `
     <div class="grand-total">
-      Total Building Consumption: ${totalConsumption}
+
+      Total Building Consumption:
+      ${totalConsumption}
+
       <br><br>
-      Total Amount to Collect: ${money(grandTotal)}
+
+      Total Amount to Collect:
+      ${money(grandTotal)}
+
     </div>
   `;
 
-  document.getElementById("reports").innerHTML = reportsHTML;
+  document.getElementById("reports").innerHTML =
+    reportsHTML;
 }
 
 function saveCurrentData() {
