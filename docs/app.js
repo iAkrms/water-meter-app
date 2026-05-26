@@ -428,11 +428,11 @@ function calculateReports() {
           }
         </div>
 
-        <div>
+        <div class="report-footer">
           <div class="total-box">
             ${tr("total")}: ${money(totalMoney)}
           </div>
-
+        
           <button type="button" class="export-btn" onclick="exportApartmentPNG(${apt.apartment})">
             ${tr("exportPNG")}
           </button>
