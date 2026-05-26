@@ -4,7 +4,6 @@
   --danger: #dc3545;
   --dark: #111827;
   --bg: #eef2f5;
-  --card: #ffffff;
   --muted: #6b7280;
   --border: #e5e7eb;
   --soft: #f8fafc;
@@ -70,10 +69,10 @@ button {
   min-height: 46px;
 }
 
-.primary { background: var(--primary); color: white; }
-.success { background: var(--success); color: white; }
-.danger { background: var(--danger); color: white; }
-.dark { background: var(--dark); color: white; }
+.primary { background: var(--primary); }
+.success { background: var(--success); }
+.danger { background: var(--danger); }
+.dark { background: var(--dark); }
 
 label {
   font-weight: bold;
@@ -89,7 +88,6 @@ input, textarea {
   max-width: 100%;
   min-width: 0;
   display: block;
-  box-sizing: border-box;
   padding: 12px;
   border-radius: 10px;
   border: 1px solid #c7c7c7;
@@ -146,53 +144,48 @@ summary::-webkit-details-marker {
   margin-bottom: 6px;
 }
 
-small {
-  display: block;
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
+/* Compact report card */
 .report-card {
-  aspect-ratio: 9 / 16;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
   border-inline-start: 5px solid var(--primary);
+  padding: 10px;
+  border-radius: 16px;
+  overflow: visible;
+  display: block;
+  aspect-ratio: auto;
+  min-height: unset;
 }
 
 .report-title {
   text-align: center;
-  font-size: 18px;
+  font-size: 17px;
   color: var(--primary);
   font-weight: bold;
+  margin-bottom: 3px;
 }
 
 .report-subtitle {
   text-align: center;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
-  margin-top: 4px;
+  margin-bottom: 6px;
 }
 
 .gauges {
   display: grid;
-  grid-template-columns: repeat(4,1fr);
-  gap: 6px;
-  margin: 10px 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 6px 0;
 }
 
 .gauge-box {
   text-align: center;
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .gauge {
   --p: 0;
-  width: 56px;
-  height: 56px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: conic-gradient(var(--primary) calc(var(--p) * 1%), #e5e7eb 0);
   display: grid;
@@ -201,22 +194,22 @@ small {
 }
 
 .gauge-inner {
-  width: 40px;
-  height: 40px;
+  width: 33px;
+  height: 33px;
   border-radius: 50%;
   background: white;
   display: grid;
   place-items: center;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: bold;
 }
 
 .mini-row {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 11px;
   border-bottom: 1px solid #eee;
-  padding: 4px 0;
+  padding: 3px 0;
   gap: 8px;
 }
 
@@ -227,19 +220,19 @@ small {
 .meters-compact {
   background: #fafafa;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 6px;
-  margin-top: 6px;
+  border-radius: 10px;
+  padding: 5px;
+  margin-top: 5px;
 }
 
 .meter-line {
   display: grid;
   grid-template-columns: 0.8fr 1fr 1fr 1fr;
-  font-size: 10px;
-  gap: 4px;
+  font-size: 9px;
+  gap: 3px;
   text-align: center;
   border-bottom: 1px solid #eee;
-  padding: 3px 0;
+  padding: 2px 0;
 }
 
 .meter-line.header {
@@ -249,37 +242,41 @@ small {
 
 .money-box {
   background: #f0f7ff;
-  padding: 8px;
-  border-radius: 12px;
-  margin-top: 8px;
+  padding: 6px;
+  border-radius: 10px;
+  margin-top: 5px;
 }
 
 .comment-box {
   background: #fff7ed;
   border: 1px solid #fed7aa;
-  border-radius: 12px;
-  padding: 7px;
-  font-size: 11px;
-  margin-top: 6px;
-  line-height: 1.4;
-  max-height: 54px;
-  overflow: hidden;
+  border-radius: 10px;
+  padding: 6px;
+  font-size: 10px;
+  margin-top: 5px;
+  line-height: 1.35;
+  max-height: none;
+  overflow: visible;
 }
 
 .total-box {
   background: var(--dark);
   color: white;
-  padding: 10px;
-  border-radius: 14px;
+  padding: 9px;
+  border-radius: 12px;
   text-align: center;
   font-weight: bold;
-  margin-top: 10px;
+  margin-top: 6px;
+  font-size: 14px;
 }
 
 .export-btn {
   background: var(--dark);
   color: white;
   font-size: 12px;
+  padding: 9px;
+  min-height: unset;
+  margin-top: 6px;
 }
 
 .grand-total {
@@ -296,18 +293,18 @@ small {
     padding: 10px;
   }
 
+  .report-card {
+    padding: 9px;
+  }
+
   .gauge {
-    width: 50px;
-    height: 50px;
+    width: 42px;
+    height: 42px;
   }
 
   .gauge-inner {
-    width: 36px;
-    height: 36px;
-    font-size: 9px;
-  }
-
-  .report-card {
-    min-height: 690px;
+    width: 30px;
+    height: 30px;
+    font-size: 8px;
   }
 }
