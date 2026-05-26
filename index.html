@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>تقرير استهلاك المياه والصرف</title>
+  <title>Bills of the month</title>
 
   <style>
     :root {
       --primary: #0069d9;
       --success: #28a745;
       --danger: #dc3545;
-      --dark: #1f2937;
+      --dark: #111827;
       --bg: #eef2f5;
       --card: #ffffff;
       --muted: #6b7280;
       --border: #e5e7eb;
+      --soft: #f8fafc;
     }
 
     body {
       font-family: Arial, sans-serif;
       background: var(--bg);
       margin: 0;
-      padding: 14px;
+      padding: 12px;
       color: #222;
     }
 
@@ -32,24 +33,16 @@
 
     h1, h2, h3 {
       text-align: center;
+      margin: 8px 0;
     }
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
+    h1 { font-size: 24px; }
+    h2 { font-size: 17px; margin-top: 18px; }
 
-    h2 {
-      font-size: 18px;
-      margin-top: 25px;
-    }
-
-    .section,
-    .apartment-card,
-    .report-card {
+    .section, .apartment-card, .report-card {
       background: var(--card);
-      padding: 15px;
-      margin-bottom: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
       border-radius: 16px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
@@ -57,48 +50,47 @@
     .top-actions {
       display: flex;
       gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .top-actions button {
-      margin-top: 0;
+      margin-bottom: 10px;
     }
 
     label {
       display: block;
-      margin-top: 10px;
-      margin-bottom: 5px;
+      margin-top: 9px;
+      margin-bottom: 4px;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    input {
+    input, textarea {
       width: 100%;
       max-width: 100%;
       min-width: 0;
       display: block;
-      padding: 12px;
-      font-size: 16px;
+      padding: 11px;
+      font-size: 15px;
       border-radius: 10px;
       border: 1px solid #ccc;
       box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
     }
 
     input[type="date"] {
-      max-width: 100%;
-      min-width: 0;
-      display: block;
       appearance: none;
       -webkit-appearance: none;
     }
 
     button {
       width: 100%;
-      padding: 14px;
-      margin-top: 10px;
+      padding: 13px;
+      margin-top: 9px;
       border: none;
       border-radius: 12px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -108,12 +100,43 @@
     .danger { background: var(--danger); color: white; }
     .dark { background: var(--dark); color: white; }
 
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    details {
+      background: var(--card);
+      margin-bottom: 10px;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    summary {
+      padding: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #ffffff;
+      color: var(--primary);
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .details-body {
+      padding: 0 14px 14px;
+    }
+
     .meter-box {
-      background: #f8fafc;
+      background: var(--soft);
       border: 1px solid var(--border);
-      padding: 12px;
+      padding: 10px;
       border-radius: 14px;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
     .meter-title {
@@ -125,109 +148,177 @@
 
     small {
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.5;
       display: block;
       margin-top: 8px;
+      font-size: 12px;
     }
 
     .report-card {
-      border-inline-start: 5px solid var(--primary);
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      box-sizing: border-box;
       padding: 12px;
-      border-radius: 14px;
+      border-radius: 22px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-inline-start: 5px solid var(--primary);
     }
 
     .report-title {
-      font-size: 18px;
+      font-size: 19px;
       font-weight: bold;
-      margin-bottom: 6px;
       color: var(--primary);
       text-align: center;
+      margin-bottom: 4px;
     }
 
-    .summary {
-      background: #f7f9fb;
-      padding: 8px;
-      border-radius: 10px;
-      margin-top: 6px;
-      line-height: 1.5;
-      font-size: 13px;
+    .report-subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
     }
 
-    .row {
+    .mini-row {
       display: flex;
       justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
       border-bottom: 1px solid #eee;
-      padding: 5px 0;
-      gap: 10px;
-      font-size: 13px;
+      padding: 4px 0;
     }
 
-    .row span:first-child {
+    .mini-row span:first-child {
       font-weight: bold;
       color: #555;
     }
 
-    .total-row {
-      background: #f0f7ff;
+    .gauges {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .gauge-box {
+      text-align: center;
+      font-size: 10px;
+    }
+
+    .gauge {
+      --p: 0;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      margin: 0 auto 4px;
+      background:
+        conic-gradient(var(--primary) calc(var(--p) * 1%), #e5e7eb 0);
+      display: grid;
+      place-items: center;
+    }
+
+    .gauge-inner {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: white;
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--dark);
+    }
+
+    .meters-compact {
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 14px;
       padding: 8px;
-      border-radius: 12px;
-      margin-top: 8px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .bar-area {
       margin-top: 6px;
-      margin-bottom: 6px;
     }
 
-    .bar-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
+    .meter-line {
+      font-size: 11px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 4px;
+      border-bottom: 1px solid #eee;
+      padding: 4px 0;
+      text-align: center;
+    }
+
+    .meter-line.header {
       font-weight: bold;
-      margin-bottom: 4px;
+      color: var(--primary);
     }
 
-    .bar-track {
-      height: 10px;
-      background: #e5e7eb;
-      border-radius: 999px;
+    .money-box {
+      background: #f0f7ff;
+      border-radius: 14px;
+      padding: 8px;
+      margin-top: 6px;
+    }
+
+    .total-box {
+      background: var(--dark);
+      color: white;
+      border-radius: 16px;
+      padding: 10px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+
+    .comment-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 12px;
+      padding: 7px;
+      font-size: 11px;
+      margin-top: 6px;
+      line-height: 1.4;
+      max-height: 48px;
       overflow: hidden;
     }
 
-    .bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #0069d9, #38bdf8);
-      border-radius: 999px;
-      width: 0%;
-    }
-
-    .meter-report {
-      border: 1px solid var(--border);
-      background: #fafafa;
-      border-radius: 12px;
-      padding: 8px;
+    .export-btn {
+      padding: 9px;
+      font-size: 12px;
       margin-top: 8px;
+      background: var(--dark);
+      color: white;
     }
 
     .grand-total {
-      background: #111827;
+      background: var(--dark);
       color: white;
-      padding: 12px;
+      padding: 13px;
       border-radius: 16px;
       text-align: center;
       font-size: 15px;
-      margin-top: 15px;
+      margin-top: 12px;
       line-height: 1.7;
     }
 
-    .export-btn {
-      padding: 10px;
-      font-size: 13px;
-      margin-top: 10px;
-      background: #111827;
-      color: white;
+    @media (max-width: 420px) {
+      .gauge {
+        width: 52px;
+        height: 52px;
+      }
+
+      .gauge-inner {
+        width: 38px;
+        height: 38px;
+        font-size: 9px;
+      }
+
+      .report-card {
+        min-height: 700px;
+      }
     }
   </style>
 </head>
@@ -246,11 +337,17 @@
   <div class="section">
     <h2 id="periodTitle"></h2>
 
-    <label id="startDateLabel"></label>
-    <input type="date" id="startDate">
+    <div class="grid-2">
+      <div>
+        <label id="startDateLabel"></label>
+        <input type="date" id="startDate">
+      </div>
 
-    <label id="endDateLabel"></label>
-    <input type="date" id="endDate">
+      <div>
+        <label id="endDateLabel"></label>
+        <input type="date" id="endDate">
+      </div>
+    </div>
   </div>
 
   <div class="section">
@@ -261,6 +358,9 @@
 
     <label id="sewageCostLabel"></label>
     <input type="number" id="totalSewageCost">
+
+    <label id="commentLabel"></label>
+    <textarea id="generalComment"></textarea>
   </div>
 
   <h2 id="readingsTitle"></h2>
@@ -287,102 +387,106 @@ const T = {
   ar: {
     dir: "rtl",
     lang: "ar",
-    title: "تقرير استهلاك المياه والصرف",
+    title: "Bills of the month",
     periodTitle: "فترة الفاتورة",
-    startDate: "تاريخ البداية",
-    endDate: "تاريخ النهاية",
-    expensesTitle: "إجمالي المصاريف الشهرية",
-    waterCost: "إجمالي مبلغ المياه المدفوع (ريال)",
-    sewageCost: "إجمالي مبلغ الصرف المدفوع (ريال)",
+    startDate: "البداية",
+    endDate: "النهاية",
+    expensesTitle: "مصاريف الشهر",
+    waterCost: "إجمالي المياه المدفوع (ريال)",
+    sewageCost: "إجمالي الصرف المدفوع (ريال)",
+    comment: "ملاحظة عامة",
     readingsTitle: "قراءات الشقق",
     apartment: "الشقة",
     meter: "العداد",
-    previousReading: "القراءة السابقة",
-    currentReading: "القراءة الحالية",
-    unpaid: "المبلغ السابق غير المدفوع (ريال)",
-    note: "يمكنك ترك الشقق أو العدادات غير المطلوبة فارغة. سيتم احتساب وحفظ القراءات المدخلة فقط.",
+    previousReading: "السابقة",
+    currentReading: "الحالية",
+    unpaid: "مبلغ غير مدفوع سابقًا (ريال)",
+    credit: "رصيد دائن / مدفوع مقدمًا (ريال)",
+    note: "افتح الشقة المطلوبة فقط. اترك العدادات غير المستخدمة فارغة.",
     generate: "إنشاء التقارير",
     save: "حفظ القراءات الحالية المدخلة",
     reset: "مسح البيانات المحفوظة",
-    exportPNG: "تصدير تقرير الشقة كصورة PNG",
-    reportsTitle: "تقارير الشقق",
+    exportPNG: "تصدير PNG",
+    reportsTitle: "Bills of the month",
     period: "الفترة",
     from: "من",
     to: "إلى",
-    apartmentReport: "تقرير الشقة",
-    apartmentNumber: "رقم الشقة",
-    apartmentConsumption: "استهلاك الشقة",
-    buildingShare: "نسبة الشقة من إجمالي الاستهلاك",
-    meterShare: "نسبة العداد من استهلاك الشقة",
-    netConsumption: "صافي الاستهلاك",
-    waterCostReport: "تكلفة المياه",
-    sewageCostReport: "تكلفة الصرف",
-    previousUnpaid: "المبلغ السابق غير المدفوع",
-    totalAmount: "الإجمالي المطلوب",
+    apartmentReport: "فاتورة الشقة",
+    aptShare: "نسبة الشقة",
+    meterShare: "نسبة العداد",
+    net: "الصافي",
+    water: "المياه",
+    sewage: "الصرف",
+    unpaidShort: "السابق",
+    creditShort: "الرصيد",
+    total: "الإجمالي",
     totalBuildingConsumption: "إجمالي استهلاك المبنى",
-    totalAmountToCollect: "إجمالي المبلغ المطلوب تحصيله",
-    noDate: "يرجى اختيار تاريخ البداية وتاريخ النهاية.",
-    badDate: "تاريخ النهاية لا يمكن أن يكون قبل تاريخ البداية.",
+    totalAmountToCollect: "إجمالي التحصيل",
+    noDate: "يرجى اختيار تاريخ البداية والنهاية.",
+    badDate: "تاريخ النهاية لا يمكن أن يكون قبل البداية.",
     noReading: "يرجى إدخال قراءة واحدة على الأقل.",
-    currentLess: "القراءة الحالية لا يمكن أن تكون أقل من القراءة السابقة.",
+    currentLess: "القراءة الحالية لا يمكن أن تكون أقل من السابقة.",
     saveOne: "يرجى إدخال قراءة حالية واحدة على الأقل قبل الحفظ.",
-    saved: "تم حفظ القراءات بنجاح. عدد العدادات المحفوظة:",
-    resetConfirm: "هل أنت متأكد من مسح جميع القراءات والمبالغ المحفوظة؟",
+    saved: "تم حفظ القراءات. عدد العدادات:",
+    resetConfirm: "هل أنت متأكد من مسح جميع البيانات؟",
     liter: "لتر",
     sar: "ريال",
-    placeholderReading: "أدخل القراءة الحالية",
+    placeholderReading: "القراءة الحالية",
     placeholderWater: "مثال: 800",
-    placeholderSewage: "مثال: 300"
+    placeholderSewage: "مثال: 300",
+    placeholderComment: "مثال: تشمل الفاتورة فترة شهرية كاملة"
   },
   en: {
     dir: "ltr",
     lang: "en",
-    title: "Water & Sewage Consumption Report",
+    title: "Bills of the month",
     periodTitle: "Billing Period",
-    startDate: "Start Date",
-    endDate: "End Date",
-    expensesTitle: "Total Monthly Expenses",
-    waterCost: "Total Water Spent (SAR)",
-    sewageCost: "Total Sewage Spent (SAR)",
+    startDate: "Start",
+    endDate: "End",
+    expensesTitle: "Monthly Expenses",
+    waterCost: "Total Water Paid (SAR)",
+    sewageCost: "Total Sewage Paid (SAR)",
+    comment: "General Comment",
     readingsTitle: "Apartment Readings",
     apartment: "Apartment",
     meter: "Meter",
-    previousReading: "Previous Reading",
-    currentReading: "Current Reading",
+    previousReading: "Previous",
+    currentReading: "Current",
     unpaid: "Previous Unpaid Amount (SAR)",
-    note: "You can leave unused apartments or meters blank. Only entered readings will be calculated and saved.",
+    credit: "Credit / Advance Paid (SAR)",
+    note: "Open only the needed apartment. Leave unused meters empty.",
     generate: "Generate Reports",
     save: "Save Entered Current Readings",
     reset: "Reset Saved Data",
-    exportPNG: "Export Apartment Report as PNG",
-    reportsTitle: "Apartment Reports",
+    exportPNG: "Export PNG",
+    reportsTitle: "Bills of the month",
     period: "Period",
     from: "From",
     to: "To",
-    apartmentReport: "Apartment Report",
-    apartmentNumber: "Apartment Number",
-    apartmentConsumption: "Apartment Consumption",
-    buildingShare: "Apartment Share of Total Consumption",
-    meterShare: "Meter Share of Apartment Consumption",
-    netConsumption: "Net Consumption",
-    waterCostReport: "Water Cost",
-    sewageCostReport: "Sewage Cost",
-    previousUnpaid: "Previous Unpaid",
-    totalAmount: "Total Amount",
+    apartmentReport: "Apartment Bill",
+    aptShare: "Apartment Share",
+    meterShare: "Meter Share",
+    net: "Net",
+    water: "Water",
+    sewage: "Sewage",
+    unpaidShort: "Unpaid",
+    creditShort: "Credit",
+    total: "Total",
     totalBuildingConsumption: "Total Building Consumption",
-    totalAmountToCollect: "Total Amount to Collect",
+    totalAmountToCollect: "Total Collection",
     noDate: "Please select start and end dates.",
     badDate: "End date cannot be before start date.",
     noReading: "Please enter at least one reading.",
     currentLess: "Current reading cannot be less than previous reading.",
     saveOne: "Please enter at least one current reading before saving.",
-    saved: "Readings saved successfully. Number of saved meters:",
-    resetConfirm: "Are you sure you want to reset all saved readings and unpaid amounts?",
+    saved: "Readings saved. Number of meters:",
+    resetConfirm: "Are you sure you want to reset all data?",
     liter: "Liters",
     sar: "SAR",
-    placeholderReading: "Enter current reading",
+    placeholderReading: "Current reading",
     placeholderWater: "Example: 800",
-    placeholderSewage: "Example: 300"
+    placeholderSewage: "Example: 300",
+    placeholderComment: "Example: Bill covers one full monthly period"
   }
 };
 
@@ -405,7 +509,7 @@ function liters(value) {
 }
 
 function percent(value) {
-  return `${Number(value).toFixed(2)}%`;
+  return `${Number(value).toFixed(1)}%`;
 }
 
 function safePercent(value) {
@@ -431,6 +535,7 @@ function renderApp() {
   document.getElementById("expensesTitle").innerText = tr("expensesTitle");
   document.getElementById("waterCostLabel").innerText = tr("waterCost");
   document.getElementById("sewageCostLabel").innerText = tr("sewageCost");
+  document.getElementById("commentLabel").innerText = tr("comment");
   document.getElementById("readingsTitle").innerText = tr("readingsTitle");
   document.getElementById("generateBtn").innerText = tr("generate");
   document.getElementById("saveBtn").innerText = tr("save");
@@ -438,6 +543,7 @@ function renderApp() {
 
   document.getElementById("totalWaterCost").placeholder = tr("placeholderWater");
   document.getElementById("totalSewageCost").placeholder = tr("placeholderSewage");
+  document.getElementById("generalComment").placeholder = tr("placeholderComment");
 
   renderApartmentInputs();
   document.getElementById("reports").innerHTML = "";
@@ -455,40 +561,54 @@ function renderApartmentInputs() {
         <div class="meter-box">
           <div class="meter-title">${tr("meter")} ${meter}</div>
 
-          <label>${tr("previousReading")}</label>
-          <input
-            type="number"
-            id="prev_${apt}_${meter}"
-            value="${getSavedValue(`apt_${apt}_meter_${meter}_previous`, 0)}"
-          >
+          <div class="grid-2">
+            <div>
+              <label>${tr("previousReading")}</label>
+              <input
+                type="number"
+                id="prev_${apt}_${meter}"
+                value="${getSavedValue(`apt_${apt}_meter_${meter}_previous`, 0)}"
+              >
+            </div>
 
-          <label>${tr("currentReading")}</label>
-          <input
-            type="number"
-            id="current_${apt}_${meter}"
-            placeholder="${tr("placeholderReading")}"
-            value="${getSavedValue(`apt_${apt}_meter_${meter}_current_draft`, "")}"
-            oninput="localStorage.setItem('apt_${apt}_meter_${meter}_current_draft', this.value)"
-          >
+            <div>
+              <label>${tr("currentReading")}</label>
+              <input
+                type="number"
+                id="current_${apt}_${meter}"
+                placeholder="${tr("placeholderReading")}"
+                value="${getSavedValue(`apt_${apt}_meter_${meter}_current_draft`, "")}"
+                oninput="localStorage.setItem('apt_${apt}_meter_${meter}_current_draft', this.value)"
+              >
+            </div>
+          </div>
         </div>
       `;
     }
 
     apartmentsDiv.innerHTML += `
-      <div class="apartment-card">
-        <h3>${tr("apartment")} ${apt}</h3>
+      <details>
+        <summary>${tr("apartment")} ${apt}</summary>
+        <div class="details-body">
+          ${metersHTML}
 
-        ${metersHTML}
+          <label>${tr("unpaid")}</label>
+          <input
+            type="number"
+            id="unpaid_${apt}"
+            value="${getSavedValue(`apt_${apt}_unpaid`, 0)}"
+          >
 
-        <label>${tr("unpaid")}</label>
-        <input
-          type="number"
-          id="unpaid_${apt}"
-          value="${getSavedValue(`apt_${apt}_unpaid`, 0)}"
-        >
+          <label>${tr("credit")}</label>
+          <input
+            type="number"
+            id="credit_${apt}"
+            value="${getSavedValue(`apt_${apt}_credit`, 0)}"
+          >
 
-        <small>${tr("note")}</small>
-      </div>
+          <small>${tr("note")}</small>
+        </div>
+      </details>
     `;
   }
 }
@@ -517,32 +637,26 @@ function collectData() {
       const netConsumption = current - previous;
       apartmentConsumption += netConsumption;
 
-      apartmentMeters.push({
-        meter,
-        previous,
-        current,
-        netConsumption
-      });
+      apartmentMeters.push({ meter, previous, current, netConsumption });
     }
 
     if (apartmentMeters.length > 0) {
       const unpaid = Number(document.getElementById(`unpaid_${apt}`).value || 0);
+      const credit = Number(document.getElementById(`credit_${apt}`).value || 0);
 
       apartments.push({
         apartment: apt,
         meters: apartmentMeters,
         apartmentConsumption,
-        unpaid
+        unpaid,
+        credit
       });
 
       totalBuildingConsumption += apartmentConsumption;
     }
   }
 
-  return {
-    apartments,
-    totalBuildingConsumption
-  };
+  return { apartments, totalBuildingConsumption };
 }
 
 function calculateReports() {
@@ -550,6 +664,7 @@ function calculateReports() {
   const endDate = document.getElementById("endDate").value;
   const totalWaterCost = Number(document.getElementById("totalWaterCost").value || 0);
   const totalSewageCost = Number(document.getElementById("totalSewageCost").value || 0);
+  const generalComment = document.getElementById("generalComment").value.trim();
 
   if (!startDate || !endDate) {
     alert(tr("noDate"));
@@ -575,115 +690,113 @@ function calculateReports() {
   let grandTotal = 0;
 
   apartments.forEach(apt => {
-    const apartmentRatio = totalBuildingConsumption === 0
-      ? 0
-      : apt.apartmentConsumption / totalBuildingConsumption;
-
+    const apartmentRatio = totalBuildingConsumption === 0 ? 0 : apt.apartmentConsumption / totalBuildingConsumption;
     const apartmentPercent = apartmentRatio * 100;
+
     const waterCost = totalWaterCost * apartmentRatio;
     const sewageCost = totalSewageCost * apartmentRatio;
-    const totalMoney = waterCost + sewageCost + apt.unpaid;
+    const totalMoney = waterCost + sewageCost + apt.unpaid - apt.credit;
 
     grandTotal += totalMoney;
 
-    let metersReportHTML = "";
+    let meterRows = "";
+    let gaugeHTML = `
+      <div class="gauge-box">
+        <div class="gauge" style="--p:${safePercent(apartmentPercent)}">
+          <div class="gauge-inner">${percent(apartmentPercent)}</div>
+        </div>
+        <div>${tr("aptShare")}</div>
+      </div>
+    `;
 
     apt.meters.forEach(m => {
-      const meterRatio = apt.apartmentConsumption === 0
-        ? 0
-        : m.netConsumption / apt.apartmentConsumption;
-
+      const meterRatio = apt.apartmentConsumption === 0 ? 0 : m.netConsumption / apt.apartmentConsumption;
       const meterPercent = meterRatio * 100;
 
-      metersReportHTML += `
-        <div class="meter-report">
-          <div class="meter-title">${tr("meter")} ${m.meter}</div>
-
-          <div class="row">
-            <span>${tr("previousReading")}</span>
-            <span>${liters(m.previous)}</span>
+      gaugeHTML += `
+        <div class="gauge-box">
+          <div class="gauge" style="--p:${safePercent(meterPercent)}">
+            <div class="gauge-inner">${percent(meterPercent)}</div>
           </div>
+          <div>${tr("meter")} ${m.meter}</div>
+        </div>
+      `;
 
-          <div class="row">
-            <span>${tr("currentReading")}</span>
-            <span>${liters(m.current)}</span>
-          </div>
-
-          <div class="row">
-            <span>${tr("netConsumption")}</span>
-            <span>${liters(m.netConsumption)}</span>
-          </div>
-
-          <div class="bar-area">
-            <div class="bar-label">
-              <span>${tr("meterShare")}</span>
-              <span>${percent(meterPercent)}</span>
-            </div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:${safePercent(meterPercent)}%"></div>
-            </div>
-          </div>
+      meterRows += `
+        <div class="meter-line">
+          <span>${tr("meter")} ${m.meter}</span>
+          <span>${liters(m.previous)}</span>
+          <span>${liters(m.current)}</span>
+          <span>${liters(m.netConsumption)}</span>
         </div>
       `;
     });
 
     reportsHTML += `
       <div class="report-card" id="report_apartment_${apt.apartment}">
-        <div class="report-title">
-          ${tr("apartmentReport")} ${apt.apartment}
-        </div>
-
-        <div class="summary">
-          <strong>${tr("period")}:</strong>
-          ${tr("from")} ${startDate}
-          ${tr("to")} ${endDate}
-        </div>
-
-        <div class="row">
-          <span>${tr("apartmentNumber")}</span>
-          <span>${apt.apartment}</span>
-        </div>
-
-        <div class="row">
-          <span>${tr("apartmentConsumption")}</span>
-          <span>${liters(apt.apartmentConsumption)}</span>
-        </div>
-
-        <div class="bar-area">
-          <div class="bar-label">
-            <span>${tr("buildingShare")}</span>
-            <span>${percent(apartmentPercent)}</span>
+        <div>
+          <div class="report-title">${tr("apartmentReport")} ${apt.apartment}</div>
+          <div class="report-subtitle">
+            ${tr("period")}: ${tr("from")} ${startDate} ${tr("to")} ${endDate}
           </div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:${safePercent(apartmentPercent)}%"></div>
+
+          <div class="gauges">
+            ${gaugeHTML}
           </div>
+
+          <div class="mini-row">
+            <span>${tr("net")}</span>
+            <span>${liters(apt.apartmentConsumption)}</span>
+          </div>
+
+          <div class="meters-compact">
+            <div class="meter-line header">
+              <span>${tr("meter")}</span>
+              <span>${tr("previousReading")}</span>
+              <span>${tr("currentReading")}</span>
+              <span>${tr("net")}</span>
+            </div>
+            ${meterRows}
+          </div>
+
+          <div class="money-box">
+            <div class="mini-row">
+              <span>${tr("water")}</span>
+              <span>${money(waterCost)}</span>
+            </div>
+
+            <div class="mini-row">
+              <span>${tr("sewage")}</span>
+              <span>${money(sewageCost)}</span>
+            </div>
+
+            <div class="mini-row">
+              <span>${tr("unpaidShort")}</span>
+              <span>${money(apt.unpaid)}</span>
+            </div>
+
+            <div class="mini-row">
+              <span>${tr("creditShort")}</span>
+              <span>${money(apt.credit)}</span>
+            </div>
+          </div>
+
+          ${generalComment ? `
+            <div class="comment-box">
+              ${generalComment}
+            </div>
+          ` : ""}
         </div>
 
-        ${metersReportHTML}
+        <div>
+          <div class="total-box">
+            ${tr("total")}: ${money(totalMoney)}
+          </div>
 
-        <div class="row">
-          <span>${tr("waterCostReport")}</span>
-          <span>${money(waterCost)}</span>
+          <button class="export-btn" onclick="exportApartmentPNG(${apt.apartment})">
+            ${tr("exportPNG")}
+          </button>
         </div>
-
-        <div class="row">
-          <span>${tr("sewageCostReport")}</span>
-          <span>${money(sewageCost)}</span>
-        </div>
-
-        <div class="row">
-          <span>${tr("previousUnpaid")}</span>
-          <span>${money(apt.unpaid)}</span>
-        </div>
-
-        <div class="total-row row">
-          <span>${tr("totalAmount")}</span>
-          <span>${money(totalMoney)}</span>
-        </div>
-
-        <button class="export-btn" onclick="exportApartmentPNG(${apt.apartment})">
-          ${tr("exportPNG")}
-        </button>
       </div>
     `;
   });
@@ -704,7 +817,10 @@ function saveCurrentData() {
 
   for (let apt = 1; apt <= APARTMENTS; apt++) {
     const unpaidInput = document.getElementById(`unpaid_${apt}`);
+    const creditInput = document.getElementById(`credit_${apt}`);
+
     localStorage.setItem(`apt_${apt}_unpaid`, Number(unpaidInput.value || 0));
+    localStorage.setItem(`apt_${apt}_credit`, Number(creditInput.value || 0));
 
     for (let meter = 1; meter <= METERS; meter++) {
       const currentInput = document.getElementById(`current_${apt}_${meter}`);
@@ -722,9 +838,7 @@ function saveCurrentData() {
       );
 
       previousInput.value = Number(currentInput.value);
-
       currentInput.value = "";
-
       savedCount++;
     }
   }
@@ -742,9 +856,10 @@ function resetAllData() {
 
   for (let apt = 1; apt <= APARTMENTS; apt++) {
     localStorage.removeItem(`apt_${apt}_unpaid`);
+    localStorage.removeItem(`apt_${apt}_credit`);
 
-    const unpaidInput = document.getElementById(`unpaid_${apt}`);
-    if (unpaidInput) unpaidInput.value = 0;
+    document.getElementById(`unpaid_${apt}`).value = 0;
+    document.getElementById(`credit_${apt}`).value = 0;
 
     for (let meter = 1; meter <= METERS; meter++) {
       localStorage.removeItem(`apt_${apt}_meter_${meter}_previous`);
@@ -771,8 +886,8 @@ function exportApartmentPNG(apartmentNumber) {
     const link = document.createElement("a");
     link.download =
       currentLang === "ar"
-        ? `تقرير_الشقة_${apartmentNumber}.png`
-        : `apartment_${apartmentNumber}_report.png`;
+        ? `فاتورة_الشقة_${apartmentNumber}.png`
+        : `apartment_${apartmentNumber}_bill.png`;
 
     link.href = canvas.toDataURL("image/png");
     link.click();
