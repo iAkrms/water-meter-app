@@ -288,6 +288,27 @@ summary::-webkit-details-marker {
   margin-bottom: 20px;
 }
 
+.report-card {
+  display: block !important;
+  aspect-ratio: auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.report-card > div {
+  display: block !important;
+}
+
+.report-footer {
+  display: block !important;
+  margin-top: 6px !important;
+}
+
+.total-box {
+  margin-top: 6px !important;
+}
+
 @media (max-width: 420px) {
   body {
     padding: 10px;
