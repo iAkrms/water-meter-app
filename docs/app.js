@@ -1,182 +1,550 @@
 const APARTMENTS = 8;
 const METERS = 3;
 
-let currentLang = "ar";
+let currentLang = localStorage.getItem("app_language") || "ar";
 
-const apartmentsDiv = document.getElementById("apartments");
+const T = {
+  ar: {
+    dir: "rtl",
+    lang: "ar",
+    title: "Bills of the month",
+    periodTitle: "فترة الفاتورة",
+    startDate: "البداية",
+    endDate: "النهاية",
+    expensesTitle: "مصاريف الشهر",
+    waterCost: "إجمالي المياه المدفوع (ريال)",
+    sewageCost: "إجمالي الصرف المدفوع (ريال)",
+    readingsTitle: "قراءات الشقق",
+    apartment: "الشقة",
+    meter: "العداد",
+    previousReading: "السابقة",
+    currentReading: "الحالية",
+    unpaid: "مبلغ غير مدفوع سابقًا (ريال)",
+    credit: "رصيد دائن / مدفوع مقدمًا (ريال)",
+    comment: "ملاحظة خاصة بالشقة",
+    note: "افتح الشقة المطلوبة فقط. اترك العدادات غير المستخدمة فارغة.",
+    generate: "إنشاء التقارير",
+    save: "حفظ القراءات",
+    reset: "إعادة ضبط البيانات",
+    exportPNG: "تصدير PNG",
+    reportsTitle: "Bills of the month",
+    period: "الفترة",
+    from: "من",
+    to: "إلى",
+    apartmentReport: "فاتورة الشقة",
+    aptShare: "نسبة الشقة",
+    net: "الصافي",
+    water: "المياه",
+    sewage: "الصرف",
+    unpaidShort: "السابق",
+    creditShort: "الرصيد",
+    total: "الإجمالي",
+    totalBuildingConsumption: "إجمالي استهلاك المبنى",
+    totalAmountToCollect: "إجمالي التحصيل",
+    noDate: "يرجى اختيار تاريخ البداية والنهاية.",
+    badDate: "تاريخ النهاية لا يمكن أن يكون قبل البداية.",
+    noReading: "يرجى إدخال قراءة واحدة على الأقل.",
+    currentLess: "القراءة الحالية لا يمكن أن تكون أقل من السابقة.",
+    saveOne: "يرجى إدخال قراءة حالية واحدة على الأقل قبل الحفظ.",
+    saved: "تم حفظ القراءات. عدد العدادات:",
+    resetConfirm: "هل أنت متأكد من مسح جميع البيانات؟",
+    liter: "لتر",
+    sar: "ريال",
+    placeholderReading: "القراءة الحالية",
+    placeholderWater: "مثال: 800",
+    placeholderSewage: "مثال: 300",
+    placeholderComment: "مثال: متبقي من الشهر السابق أو ملاحظة خاصة"
+  },
+  en: {
+    dir: "ltr",
+    lang: "en",
+    title: "Bills of the month",
+    periodTitle: "Billing Period",
+    startDate: "Start",
+    endDate: "End",
+    expensesTitle: "Monthly Expenses",
+    waterCost: "Total Water Paid (SAR)",
+    sewageCost: "Total Sewage Paid (SAR)",
+    readingsTitle: "Apartment Readings",
+    apartment: "Apartment",
+    meter: "Meter",
+    previousReading: "Previous",
+    currentReading: "Current",
+    unpaid: "Previous Unpaid Amount (SAR)",
+    credit: "Credit / Advance Paid (SAR)",
+    comment: "Apartment Comment",
+    note: "Open only the needed apartment. Leave unused meters empty.",
+    generate: "Generate Reports",
+    save: "Save Readings",
+    reset: "Reset Data",
+    exportPNG: "Export PNG",
+    reportsTitle: "Bills of the month",
+    period: "Period",
+    from: "From",
+    to: "To",
+    apartmentReport: "Apartment Bill",
+    aptShare: "Apartment Share",
+    net: "Net",
+    water: "Water",
+    sewage: "Sewage",
+    unpaidShort: "Unpaid",
+    creditShort: "Credit",
+    total: "Total",
+    totalBuildingConsumption: "Total Building Consumption",
+    totalAmountToCollect: "Total Collection",
+    noDate: "Please select start and end dates.",
+    badDate: "End date cannot be before start date.",
+    noReading: "Please enter at least one reading.",
+    currentLess: "Current reading cannot be less than previous reading.",
+    saveOne: "Please enter at least one current reading before saving.",
+    saved: "Readings saved. Number of meters:",
+    resetConfirm: "Are you sure you want to reset all data?",
+    liter: "Liters",
+    sar: "SAR",
+    placeholderReading: "Current reading",
+    placeholderWater: "Example: 800",
+    placeholderSewage: "Example: 300",
+    placeholderComment: "Example: Previous balance or apartment note"
+  }
+};
+
+function tr(key) {
+  return T[currentLang][key];
+}
+
+function getSavedValue(key, defaultValue) {
+  return localStorage.getItem(key) !== null
+    ? localStorage.getItem(key)
+    : defaultValue;
+}
+
+function money(value) {
+  return `${Number(value).toFixed(2)} ${tr("sar")}`;
+}
+
+function liters(value) {
+  return `${Number(value).toLocaleString()} ${tr("liter")}`;
+}
+
+function percent(value) {
+  return `${Number(value).toFixed(1)}%`;
+}
+
+function safePercent(value) {
+  if (!isFinite(value) || isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+}
 
 function setLanguage(lang) {
   currentLang = lang;
+  localStorage.setItem("app_language", lang);
+  renderApp();
 }
 
-function renderApartments() {
+function renderApp() {
+  document.documentElement.lang = tr("lang");
+  document.documentElement.dir = tr("dir");
+  document.body.dir = tr("dir");
+
+  document.getElementById("mainTitle").innerText = tr("title");
+  document.getElementById("periodTitle").innerText = tr("periodTitle");
+  document.getElementById("startDateLabel").innerText = tr("startDate");
+  document.getElementById("endDateLabel").innerText = tr("endDate");
+  document.getElementById("expensesTitle").innerText = tr("expensesTitle");
+  document.getElementById("waterCostLabel").innerText = tr("waterCost");
+  document.getElementById("sewageCostLabel").innerText = tr("sewageCost");
+  document.getElementById("readingsTitle").innerText = tr("readingsTitle");
+
+  document.getElementById("generateBtn").innerText = tr("generate");
+  document.getElementById("saveBtn").innerText = tr("save");
+  document.getElementById("resetBtn").innerText = tr("reset");
+
+  document.getElementById("totalWaterCost").placeholder = tr("placeholderWater");
+  document.getElementById("totalSewageCost").placeholder = tr("placeholderSewage");
+
+  renderApartmentInputs();
+  document.getElementById("reports").innerHTML = "";
+}
+
+function renderApartmentInputs() {
+  const apartmentsDiv = document.getElementById("apartments");
+  apartmentsDiv.innerHTML = "";
 
   for (let apt = 1; apt <= APARTMENTS; apt++) {
-
     let metersHTML = "";
 
     for (let meter = 1; meter <= METERS; meter++) {
-
       metersHTML += `
         <div class="meter-box">
-
-          <strong>عداد ${meter}</strong>
+          <div class="meter-name">${tr("meter")} ${meter}</div>
 
           <div class="grid-2">
-
             <div>
-              <label>السابقة</label>
-              <input type="number" id="prev_${apt}_${meter}" value="0">
+              <label>${tr("previousReading")}</label>
+              <input
+                type="number"
+                id="prev_${apt}_${meter}"
+                value="${getSavedValue(`apt_${apt}_meter_${meter}_previous`, 0)}"
+              >
             </div>
 
             <div>
-              <label>الحالية</label>
-              <input type="number" id="current_${apt}_${meter}">
+              <label>${tr("currentReading")}</label>
+              <input
+                type="number"
+                id="current_${apt}_${meter}"
+                placeholder="${tr("placeholderReading")}"
+                value="${getSavedValue(`apt_${apt}_meter_${meter}_current_draft`, "")}"
+                oninput="localStorage.setItem('apt_${apt}_meter_${meter}_current_draft', this.value)"
+              >
             </div>
-
           </div>
-
         </div>
       `;
     }
 
     apartmentsDiv.innerHTML += `
       <details>
-
-        <summary>الشقة ${apt}</summary>
+        <summary>${tr("apartment")} ${apt}</summary>
 
         <div class="details-body">
-
           ${metersHTML}
 
-          <label>غير مدفوع سابق</label>
-          <input type="number" id="unpaid_${apt}" value="0">
+          <label>${tr("unpaid")}</label>
+          <input
+            type="number"
+            id="unpaid_${apt}"
+            value="${getSavedValue(`apt_${apt}_unpaid`, 0)}"
+          >
 
-          <label>رصيد دائن</label>
-          <input type="number" id="credit_${apt}" value="0">
+          <label>${tr("credit")}</label>
+          <input
+            type="number"
+            id="credit_${apt}"
+            value="${getSavedValue(`apt_${apt}_credit`, 0)}"
+          >
 
+          <label>${tr("comment")}</label>
+          <textarea
+            id="comment_${apt}"
+            placeholder="${tr("placeholderComment")}"
+          >${getSavedValue(`apt_${apt}_comment`, "")}</textarea>
+
+          <small>${tr("note")}</small>
         </div>
-
       </details>
     `;
   }
 }
 
+function collectData() {
+  let apartments = [];
+  let totalBuildingConsumption = 0;
+
+  for (let apt = 1; apt <= APARTMENTS; apt++) {
+    let apartmentMeters = [];
+    let apartmentConsumption = 0;
+
+    for (let meter = 1; meter <= METERS; meter++) {
+      const previous = Number(document.getElementById(`prev_${apt}_${meter}`).value || 0);
+      const currentInput = document.getElementById(`current_${apt}_${meter}`).value;
+
+      if (currentInput === "") continue;
+
+      const current = Number(currentInput);
+
+      if (current < previous) {
+        alert(`${tr("apartment")} ${apt} - ${tr("meter")} ${meter}: ${tr("currentLess")}`);
+        return null;
+      }
+
+      const netConsumption = current - previous;
+      apartmentConsumption += netConsumption;
+
+      apartmentMeters.push({
+        meter,
+        previous,
+        current,
+        netConsumption
+      });
+    }
+
+    if (apartmentMeters.length > 0) {
+      apartments.push({
+        apartment: apt,
+        meters: apartmentMeters,
+        apartmentConsumption,
+        unpaid: Number(document.getElementById(`unpaid_${apt}`).value || 0),
+        credit: Number(document.getElementById(`credit_${apt}`).value || 0),
+        comment: document.getElementById(`comment_${apt}`).value.trim()
+      });
+
+      totalBuildingConsumption += apartmentConsumption;
+    }
+  }
+
+  return {
+    apartments,
+    totalBuildingConsumption
+  };
+}
+
 function calculateReports() {
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+  const totalWaterCost = Number(document.getElementById("totalWaterCost").value || 0);
+  const totalSewageCost = Number(document.getElementById("totalSewageCost").value || 0);
 
-  const reportsDiv = document.getElementById("reports");
+  if (!startDate || !endDate) {
+    alert(tr("noDate"));
+    return;
+  }
 
-  reportsDiv.innerHTML = `
-    <div class="report-card">
+  if (new Date(endDate) < new Date(startDate)) {
+    alert(tr("badDate"));
+    return;
+  }
 
-      <div>
+  const result = collectData();
+  if (!result) return;
 
-        <div class="report-title">
-          Bills of the month
+  const { apartments, totalBuildingConsumption } = result;
+
+  if (apartments.length === 0) {
+    alert(tr("noReading"));
+    return;
+  }
+
+  let reportsHTML = `<h2>${tr("reportsTitle")}</h2>`;
+  let grandTotal = 0;
+
+  apartments.forEach(apt => {
+    const apartmentRatio =
+      totalBuildingConsumption === 0
+        ? 0
+        : apt.apartmentConsumption / totalBuildingConsumption;
+
+    const apartmentPercent = apartmentRatio * 100;
+    const waterCost = totalWaterCost * apartmentRatio;
+    const sewageCost = totalSewageCost * apartmentRatio;
+    const totalMoney = waterCost + sewageCost + apt.unpaid - apt.credit;
+
+    grandTotal += totalMoney;
+
+    let gaugeHTML = `
+      <div class="gauge-box">
+        <div class="gauge" style="--p:${safePercent(apartmentPercent)}">
+          <div class="gauge-inner">${percent(apartmentPercent)}</div>
         </div>
-
-        <div class="report-subtitle">
-          Example Compact Report
-        </div>
-
-        <div class="gauges">
-
-          <div class="gauge-box">
-            <div class="gauge" style="--p:72">
-              <div class="gauge-inner">72%</div>
-            </div>
-            <div>Apartment</div>
-          </div>
-
-          <div class="gauge-box">
-            <div class="gauge" style="--p:25">
-              <div class="gauge-inner">25%</div>
-            </div>
-            <div>M1</div>
-          </div>
-
-          <div class="gauge-box">
-            <div class="gauge" style="--p:40">
-              <div class="gauge-inner">40%</div>
-            </div>
-            <div>M2</div>
-          </div>
-
-          <div class="gauge-box">
-            <div class="gauge" style="--p:35">
-              <div class="gauge-inner">35%</div>
-            </div>
-            <div>M3</div>
-          </div>
-
-        </div>
-
-        <div class="money-box">
-
-          <div class="mini-row">
-            <span>Water</span>
-            <span>120 SAR</span>
-          </div>
-
-          <div class="mini-row">
-            <span>Sewage</span>
-            <span>45 SAR</span>
-          </div>
-
-          <div class="mini-row">
-            <span>Previous</span>
-            <span>20 SAR</span>
-          </div>
-
-          <div class="mini-row">
-            <span>Credit</span>
-            <span>10 SAR</span>
-          </div>
-
-        </div>
-
+        <div>${tr("aptShare")}</div>
       </div>
+    `;
 
-      <div>
+    let meterRows = "";
 
-        <div class="total-box">
-          Total: 175 SAR
+    apt.meters.forEach(m => {
+      const meterRatio =
+        apt.apartmentConsumption === 0
+          ? 0
+          : m.netConsumption / apt.apartmentConsumption;
+
+      const meterPercent = meterRatio * 100;
+
+      gaugeHTML += `
+        <div class="gauge-box">
+          <div class="gauge" style="--p:${safePercent(meterPercent)}">
+            <div class="gauge-inner">${percent(meterPercent)}</div>
+          </div>
+          <div>${tr("meter")} ${m.meter}</div>
+        </div>
+      `;
+
+      meterRows += `
+        <div class="meter-line">
+          <span>${tr("meter")} ${m.meter}</span>
+          <span>${liters(m.previous)}</span>
+          <span>${liters(m.current)}</span>
+          <span>${liters(m.netConsumption)}</span>
+        </div>
+      `;
+    });
+
+    reportsHTML += `
+      <div class="report-card" id="report_apartment_${apt.apartment}">
+        <div>
+          <div class="report-title">
+            ${tr("apartmentReport")} ${apt.apartment}
+          </div>
+
+          <div class="report-subtitle">
+            ${tr("period")}: ${tr("from")} ${startDate} ${tr("to")} ${endDate}
+          </div>
+
+          <div class="gauges">
+            ${gaugeHTML}
+          </div>
+
+          <div class="mini-row">
+            <span>${tr("net")}</span>
+            <span>${liters(apt.apartmentConsumption)}</span>
+          </div>
+
+          <div class="meters-compact">
+            <div class="meter-line header">
+              <span>${tr("meter")}</span>
+              <span>${tr("previousReading")}</span>
+              <span>${tr("currentReading")}</span>
+              <span>${tr("net")}</span>
+            </div>
+            ${meterRows}
+          </div>
+
+          <div class="money-box">
+            <div class="mini-row">
+              <span>${tr("water")}</span>
+              <span>${money(waterCost)}</span>
+            </div>
+
+            <div class="mini-row">
+              <span>${tr("sewage")}</span>
+              <span>${money(sewageCost)}</span>
+            </div>
+
+            <div class="mini-row">
+              <span>${tr("unpaidShort")}</span>
+              <span>${money(apt.unpaid)}</span>
+            </div>
+
+            <div class="mini-row">
+              <span>${tr("creditShort")}</span>
+              <span>${money(apt.credit)}</span>
+            </div>
+          </div>
+
+          ${
+            apt.comment
+              ? `<div class="comment-box">${apt.comment}</div>`
+              : ""
+          }
         </div>
 
-        <button class="export-btn" onclick="exportPNG()">
-          Export PNG
-        </button>
+        <div>
+          <div class="total-box">
+            ${tr("total")}: ${money(totalMoney)}
+          </div>
 
+          <button type="button" class="export-btn" onclick="exportApartmentPNG(${apt.apartment})">
+            ${tr("exportPNG")}
+          </button>
+        </div>
       </div>
+    `;
+  });
 
+  reportsHTML += `
+    <div class="grand-total">
+      ${tr("totalBuildingConsumption")}: ${liters(totalBuildingConsumption)}
+      <br>
+      ${tr("totalAmountToCollect")}: ${money(grandTotal)}
     </div>
   `;
+
+  document.getElementById("reports").innerHTML = reportsHTML;
 }
 
 function saveCurrentData() {
-  alert("Saved");
+  let savedCount = 0;
+
+  for (let apt = 1; apt <= APARTMENTS; apt++) {
+    localStorage.setItem(
+      `apt_${apt}_unpaid`,
+      Number(document.getElementById(`unpaid_${apt}`).value || 0)
+    );
+
+    localStorage.setItem(
+      `apt_${apt}_credit`,
+      Number(document.getElementById(`credit_${apt}`).value || 0)
+    );
+
+    localStorage.setItem(
+      `apt_${apt}_comment`,
+      document.getElementById(`comment_${apt}`).value || ""
+    );
+
+    for (let meter = 1; meter <= METERS; meter++) {
+      const currentInput = document.getElementById(`current_${apt}_${meter}`);
+      const previousInput = document.getElementById(`prev_${apt}_${meter}`);
+
+      if (currentInput.value === "") continue;
+
+      localStorage.setItem(
+        `apt_${apt}_meter_${meter}_previous`,
+        Number(currentInput.value)
+      );
+
+      localStorage.removeItem(
+        `apt_${apt}_meter_${meter}_current_draft`
+      );
+
+      previousInput.value = Number(currentInput.value);
+      currentInput.value = "";
+
+      savedCount++;
+    }
+  }
+
+  if (savedCount === 0) {
+    alert(tr("saveOne"));
+    return;
+  }
+
+  alert(`${tr("saved")} ${savedCount}`);
 }
 
 function resetAllData() {
-  location.reload();
+  if (!confirm(tr("resetConfirm"))) return;
+
+  for (let apt = 1; apt <= APARTMENTS; apt++) {
+    localStorage.removeItem(`apt_${apt}_unpaid`);
+    localStorage.removeItem(`apt_${apt}_credit`);
+    localStorage.removeItem(`apt_${apt}_comment`);
+
+    document.getElementById(`unpaid_${apt}`).value = 0;
+    document.getElementById(`credit_${apt}`).value = 0;
+    document.getElementById(`comment_${apt}`).value = "";
+
+    for (let meter = 1; meter <= METERS; meter++) {
+      localStorage.removeItem(`apt_${apt}_meter_${meter}_previous`);
+      localStorage.removeItem(`apt_${apt}_meter_${meter}_current_draft`);
+
+      document.getElementById(`prev_${apt}_${meter}`).value = 0;
+      document.getElementById(`current_${apt}_${meter}`).value = "";
+    }
+  }
+
+  document.getElementById("reports").innerHTML = "";
 }
 
-function exportPNG() {
+function exportApartmentPNG(apartmentNumber) {
+  const report = document.getElementById(`report_apartment_${apartmentNumber}`);
 
-  const report = document.querySelector(".report-card");
+  if (!report) return;
 
   html2canvas(report, {
     scale: 2,
-    backgroundColor: "#ffffff"
+    backgroundColor: "#ffffff",
+    useCORS: true
   }).then(canvas => {
-
     const link = document.createElement("a");
 
-    link.download = "report.png";
-    link.href = canvas.toDataURL();
+    link.download =
+      currentLang === "ar"
+        ? `فاتورة_الشقة_${apartmentNumber}.png`
+        : `apartment_${apartmentNumber}_bill.png`;
 
+    link.href = canvas.toDataURL("image/png");
     link.click();
   });
 }
 
-renderApartments();
+renderApp();
