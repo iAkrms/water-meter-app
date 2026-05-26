@@ -59,13 +59,33 @@ button {
 .danger { background: var(--danger); color: white; }
 .dark { background: var(--dark); color: white; }
 
+label {
+  font-weight: bold;
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
 input, textarea {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   padding: 11px;
   border-radius: 10px;
   border: 1px solid #ccc;
   margin-top: 4px;
+  font-family: Arial, sans-serif;
+}
+
+textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .grid-2 {
@@ -78,6 +98,11 @@ summary {
   font-weight: bold;
   color: var(--primary);
   cursor: pointer;
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
 }
 
 .details-body {
@@ -97,6 +122,7 @@ summary {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 .report-title {
@@ -129,8 +155,7 @@ summary {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background:
-    conic-gradient(var(--primary) calc(var(--p) * 1%), #e5e7eb 0);
+  background: conic-gradient(var(--primary) calc(var(--p) * 1%), #e5e7eb 0);
   display: grid;
   place-items: center;
   margin: auto;
@@ -155,11 +180,46 @@ summary {
   padding: 4px 0;
 }
 
+.meters-compact {
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+  margin-top: 6px;
+}
+
+.meter-line {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  font-size: 10px;
+  gap: 4px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  padding: 3px 0;
+}
+
+.meter-line.header {
+  font-weight: bold;
+  color: var(--primary);
+}
+
 .money-box {
   background: #f0f7ff;
   padding: 8px;
   border-radius: 12px;
   margin-top: 8px;
+}
+
+.comment-box {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  padding: 7px;
+  font-size: 11px;
+  margin-top: 6px;
+  line-height: 1.4;
+  max-height: 48px;
+  overflow: hidden;
 }
 
 .total-box {
